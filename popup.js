@@ -35,6 +35,7 @@ const inputs = {
 };
 
 let lastContext = null;
+let endOffsetDays = 0;
 
 init();
 
@@ -54,6 +55,12 @@ function init() {
 
   form.addEventListener("submit", handleSubmit);
   clearButton.addEventListener("click", clearForm);
+
+  [inputs.date, inputs.startTime, inputs.endTime].forEach((input) => {
+    input.addEventListener("input", () => {
+      endOffsetDays = 0;
+    });
+  });
 }
 
 function setSelectionState(statusText, selectionText) {
@@ -89,7 +96,15 @@ function hydrateForm(context) {
   inputs.description.value = buildDescription(context);
   inputs.reminder.value = String(defaultReminderMinutes);
 
-  const parsed = parseCroatianDateTime(context.selectionText);
+  const parser = window.KalendarParser;
+  if (!parser || typeof parser.parseCroatianDateTime !== "function") {
+    updateStatus("Parser unavailable. Reload the extension.", "error");
+    return;
+  }
+
+  const parsed = parser.parseCroatianDateTime(context.selectionText, {
+    durationMinutes: defaultDurationMinutes
+  });
   if (!parsed) {
     updateStatus("Could not parse a date and time from the selection.", "error");
     return;
@@ -98,8 +113,13 @@ function hydrateForm(context) {
   inputs.date.value = parsed.dateInput;
   inputs.startTime.value = parsed.startTimeInput;
   inputs.endTime.value = parsed.endTimeInput;
+  endOffsetDays = parsed.endOffsetDays || 0;
 
-  updateStatus("Ready to sync.", "neutral");
+  if (endOffsetDays > 0) {
+    updateStatus("Parsed a time range that ends after midnight. Review the end time if needed.", "neutral");
+  } else {
+    updateStatus("Ready to sync.", "neutral");
+  }
 }
 
 function guessTitle(context) {
@@ -176,59 +196,6 @@ function buildDescription(context) {
   return lines.join("\n");
 }
 
-function parseCroatianDateTime(text) {
-  if (!text) {
-    return null;
-  }
-
-  const cleaned = cleanText(text);
-  const dateWithYear = cleaned.match(/(\d{1,2})\s*\.\s*(\d{1,2})\s*\.\s*(\d{4})/);
-  const dateWithoutYear = cleaned.match(/(\d{1,2})\s*\.\s*(\d{1,2})\s*\.?/);
-  const dateMatch = dateWithYear || dateWithoutYear;
-  const timeMatch = cleaned.match(/(\d{1,2})\s*:\s*(\d{2})/);
-
-  if (!dateMatch || !timeMatch) {
-    return null;
-  }
-
-  const day = Number.parseInt(dateMatch[1], 10);
-  const month = Number.parseInt(dateMatch[2], 10);
-  const yearFromText = dateWithYear ? Number.parseInt(dateMatch[3], 10) : null;
-  const hour = Number.parseInt(timeMatch[1], 10);
-  const minute = Number.parseInt(timeMatch[2], 10);
-
-  if (!isValidTime(hour, minute) || !isValidDate(day, month)) {
-    return null;
-  }
-
-  const now = new Date();
-  let year = yearFromText || now.getFullYear();
-  let start = new Date(year, month - 1, day, hour, minute);
-
-  if (!yearFromText && start < now) {
-    year += 1;
-    start = new Date(year, month - 1, day, hour, minute);
-  }
-
-  if (!isValidDateTime(start, day, month)) {
-    return null;
-  }
-
-  const end = new Date(start.getTime() + defaultDurationMinutes * 60 * 1000);
-
-  return {
-    start,
-    end,
-    dateInput: formatDateInput(start),
-    startTimeInput: formatTimeInput(start),
-    endTimeInput: formatTimeInput(end)
-  };
-}
-
-function isValidDate(day, month) {
-  return day >= 1 && day <= 31 && month >= 1 && month <= 12;
-}
-
 function isValidTime(hour, minute) {
   return hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59;
 }
@@ -237,20 +204,13 @@ function isValidDateTime(date, day, month) {
   return date.getDate() === day && date.getMonth() === month - 1;
 }
 
-function formatDateInput(date) {
-  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
-}
-
-function formatTimeInput(date) {
-  return `${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
-}
-
 function pad2(value) {
   return String(value).padStart(2, "0");
 }
 
 function clearForm() {
   form.reset();
+  endOffsetDays = 0;
   updateStatus("Cleared.", "neutral");
 }
 
@@ -265,7 +225,9 @@ function handleSubmit(event) {
     return;
   }
 
-  if (end <= start) {
+  const adjustedEnd = endOffsetDays > 0 ? addDays(end, endOffsetDays) : end;
+
+  if (adjustedEnd <= start) {
     updateStatus("End time must be after the start time.", "error");
     return;
   }
@@ -290,7 +252,7 @@ function handleSubmit(event) {
       timeZone
     },
     end: {
-      dateTime: toLocalISOString(end),
+      dateTime: toLocalISOString(adjustedEnd),
       timeZone
     },
     reminders,
@@ -331,6 +293,12 @@ function parseDateTimeInput(dateValue, timeValue) {
   }
 
   return date;
+}
+
+function addDays(date, days) {
+  const copy = new Date(date.getTime());
+  copy.setDate(copy.getDate() + days);
+  return copy;
 }
 
 function toLocalISOString(date) {

@@ -5,7 +5,7 @@ Add a selected film date/time to Google Calendar in one right-click. Designed fo
 ## What it does
 
 - Adds a right-click menu item: **Add to Google Calendar**
-- Parses Croatian date/time formats like `Nedjelja, 28.12.2025 21:00` or `19.12. u 16:00`
+- Parses Croatian and English date/time formats like `Nedjelja, 28.12.2025 21:00`, `Dec 28, 2025 7pm`, `today 19:00`, or `19:00-21:15`
 - Guesses event title from the page heading/title
 - Guesses venue from known cinema names
 - Lets you adjust title, time, venue, notes, and reminder before syncing
@@ -47,6 +47,11 @@ Edge:
 - Known venues and addresses: `popup.js` (`knownVenues`)
 - Default duration: `popup.js` (`defaultDurationMinutes`)
 - Default reminder: `popup.js` (`defaultReminderMinutes`)
+- Date parsing rules: `parser.js`
+
+## Tests
+
+- Run `node tests/dateParser.test.js`
 
 ## Notes
 

@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "Kalendar",
+  "name": "Popcorn Planner",
   "version": "0.1.0",
   "description": "Add selected event times to Google Calendar.",
   "action": {
-    "default_title": "Kalendar",
+    "default_title": "Popcorn Planner",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
