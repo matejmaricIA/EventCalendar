@@ -18,7 +18,7 @@
 
 body {
   margin: 0;
-  min-width: 340px;
+  min-width: 420px;
   background: linear-gradient(140deg, var(--bg) 0%, var(--bg-accent) 48%, #f9f1e4 100%);
   color: var(--ink);
   font-family: "Trebuchet MS", "Segoe UI", sans-serif;
@@ -53,6 +53,12 @@ body {
   animation: rise 520ms ease both;
 }
 
+.hero-side {
+  display: grid;
+  gap: 12px;
+  justify-items: end;
+}
+
 .eyebrow {
   margin: 0 0 6px;
   text-transform: uppercase;
@@ -81,6 +87,24 @@ body {
   color: var(--accent-strong);
   font-size: 0.78rem;
   font-weight: 600;
+}
+
+.language {
+  display: grid;
+  gap: 6px;
+  justify-items: end;
+  text-align: right;
+}
+
+.language label {
+  font-size: 0.72rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.language select {
+  min-width: 140px;
 }
 
 main {
@@ -138,7 +162,8 @@ label {
 }
 
 input,
-textarea {
+textarea,
+select {
   border-radius: 12px;
   border: 1px solid rgba(27, 27, 27, 0.1);
   padding: 10px 12px;
@@ -148,9 +173,37 @@ textarea {
 }
 
 input:focus,
-textarea:focus {
+textarea:focus,
+select:focus {
   outline: 2px solid rgba(47, 127, 102, 0.35);
   border-color: rgba(47, 127, 102, 0.5);
+}
+
+.reminder-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.reminders {
+  display: grid;
+  gap: 10px;
+}
+
+.reminder-row input,
+.reminder-row select {
+  flex: 1 1 140px;
+}
+
+.reminder-actions {
+  margin-top: 10px;
+}
+
+.reminder-remove {
+  padding: 8px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
 }
 
 .grid {
@@ -261,6 +314,12 @@ button.ghost {
   .hero {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .hero-side,
+  .language {
+    justify-items: start;
+    text-align: left;
   }
 
   .grid {

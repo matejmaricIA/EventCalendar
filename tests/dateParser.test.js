@@ -1,5 +1,7 @@
 const assert = require("assert");
-const { parseCroatianDateTime } = require("../parser");
+const { parseCroatianDateTime, inferDurationMinutes } = require("../parser");
+
+const currentYear = new Date().getFullYear();
 
 function expectParse(input, options, expected) {
   const result = parseCroatianDateTime(input, options);
@@ -41,7 +43,12 @@ const cases = [
   {
     input: "19.12. u 16:00",
     options: { referenceDate: referenceLate },
-    expected: { date: "2026-12-19", start: "16:00", end: "18:00" }
+    expected: { date: "2025-12-19", start: "16:00", end: "18:00" }
+  },
+  {
+    input: "19.12. 20:30",
+    options: { referenceDate: referenceLate },
+    expected: { date: "2025-12-19", start: "20:30", end: "22:30" }
   },
   {
     input: "7.1.2026 u 9:05",
@@ -81,7 +88,7 @@ const cases = [
   {
     input: "Dec 28 7-9pm",
     options: null,
-    expected: { date: "2025-12-28", start: "19:00", end: "21:00" }
+    expected: { date: `${currentYear}-12-28`, start: "19:00", end: "21:00" }
   },
   {
     input: "28.12.2025 7pm to 9pm",
@@ -129,6 +136,16 @@ const cases = [
     expected: { date: "2025-12-12", start: "19:00", end: "21:00" }
   },
   {
+    input: "Pet19:30",
+    options: { referenceDate: referenceEarly },
+    expected: { date: "2025-12-12", start: "19:30", end: "21:30" }
+  },
+  {
+    input: "Pet19:30 19.12.",
+    options: { referenceDate: referenceEarly },
+    expected: { date: "2025-12-19", start: "19:30", end: "21:30" }
+  },
+  {
     input: "u petak u 19 sati",
     options: { referenceDate: referenceEarly },
     expected: { date: "2025-12-12", start: "19:00", end: "21:00" }
@@ -158,10 +175,29 @@ const crossMidnight = parseCroatianDateTime("Dec 28 11pm-1am", null);
 assert(crossMidnight, "Expected to parse cross-midnight range");
 assert.strictEqual(crossMidnight.endOffsetDays, 1, "Expected endOffsetDays for cross-midnight range");
 
+const dateOnly = parseCroatianDateTime("petak, 09.01.", {
+  referenceDate: referenceEarly,
+  allowMissingTime: true
+});
+assert(dateOnly, "Expected to parse date-only with weekday");
+assert.strictEqual(dateOnly.dateInput, "2025-01-09", "date-only date");
+assert.strictEqual(dateOnly.startTimeInput, "", "date-only start");
+assert.strictEqual(dateOnly.endTimeInput, "", "date-only end");
+assert.strictEqual(dateOnly.timeMissing, true, "date-only timeMissing");
+
 expectNull("31.02.2025 20:00", null);
 expectNull("32.12.2025 20:00", null);
 expectNull("28.12.2025 24:00", null);
 expectNull("Nedjelja bez vremena", null);
 expectNull("19.12.", null);
+
+assert.strictEqual(inferDurationMinutes("Trajanje 145'"), 145, "duration prime minutes");
+assert.strictEqual(inferDurationMinutes("Trajanje: 110 min"), 110, "duration min label");
+assert.strictEqual(inferDurationMinutes("2 sata i 15 minuta"), 135, "duration hours and minutes");
+assert.strictEqual(inferDurationMinutes("140 minuta"), 140, "duration minutes hr");
+assert.strictEqual(inferDurationMinutes("120 minutes"), 120, "duration minutes en");
+assert.strictEqual(inferDurationMinutes("2h 15m"), 135, "duration compact h m");
+assert.strictEqual(inferDurationMinutes("2h15m"), 135, "duration compact no space");
+assert.strictEqual(inferDurationMinutes("u 19 sati"), null, "avoid time-of-day hours only");
 
 console.log("dateParser.test.js: all tests passed");

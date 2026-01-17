@@ -1,96 +1,122 @@
 <!doctype html>
-<html lang="en">
+<html lang="hr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Kalendar</title>
+    <title>Podsjeti.Me</title>
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
     <div class="app">
       <header class="hero">
         <div>
-          <p class="eyebrow">Kalendar</p>
-          <h1>Add a film night</h1>
-          <p class="subtitle">From selection to Google Calendar in one step.</p>
+          <p class="eyebrow" data-i18n="appName">Podsjeti.Me</p>
+          <h1 data-i18n="heroTitle">Dodaj doga&#273;aj</h1>
+          <p class="subtitle" data-i18n="heroSubtitle">Od odabira do Google Kalendara u jednom koraku.</p>
         </div>
-        <div class="badge">Croatia cinema helper</div>
+        <div class="hero-side">
+          <div class="badge" data-i18n="heroBadge">Brzi planer</div>
+          <div class="language">
+            <label for="language" data-i18n="languageLabel">Jezik</label>
+            <select id="language">
+              <option value="hr">Hrvatski</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+        </div>
       </header>
 
       <main>
         <section class="panel">
           <div class="panel-head">
-            <h2>Selection</h2>
-            <span class="panel-hint" id="selection-status">Waiting for selection</span>
+            <h2 data-i18n="sectionSelection">Odabir</h2>
+            <span class="panel-hint" id="selection-status">&#268;eka odabir</span>
           </div>
-          <div class="selection" id="selection-text">Select a date/time on a page and right click.</div>
+          <div class="selection" id="selection-text" data-i18n="selectionPlaceholder">Ozna&#269;i datum/vrijeme na stranici i klikni desni klik.</div>
         </section>
 
         <section class="panel">
           <div class="panel-head">
-            <h2>Event details</h2>
-            <span class="panel-hint">Edit anything before syncing.</span>
+            <h2 data-i18n="eventDetailsTitle">Detalji doga&#273;aja</h2>
+            <span class="panel-hint" data-i18n="eventDetailsHint">Promijeni prije spremanja.</span>
           </div>
 
           <form id="event-form">
             <div class="field">
-              <label for="title">Title</label>
+              <label for="title" data-i18n="fieldTitle">Naslov</label>
               <input id="title" name="title" type="text" autocomplete="off" required />
             </div>
 
             <div class="grid">
               <div class="field">
-                <label for="date">Date</label>
+                <label for="date" data-i18n="fieldDate">Datum</label>
                 <input id="date" name="date" type="date" required />
               </div>
               <div class="field">
-                <label for="start-time">Start</label>
+                <label for="start-time" data-i18n="fieldStart">Po&#269;etak</label>
                 <input id="start-time" name="start-time" type="time" required />
               </div>
               <div class="field">
-                <label for="end-time">End</label>
+                <label for="end-time" data-i18n="fieldEnd">Kraj</label>
                 <input id="end-time" name="end-time" type="time" required />
               </div>
             </div>
 
             <div class="field">
-              <label for="location">Venue</label>
+              <label for="location" data-i18n="fieldVenue">Lokacija</label>
               <input id="location" name="location" type="text" autocomplete="off" />
             </div>
 
             <div class="field">
-              <label for="reminder">Reminder (minutes before)</label>
-              <input id="reminder" name="reminder" type="number" min="0" max="1440" step="5" value="30" />
-              <p class="hint">Use 0 to keep your calendar default reminders.</p>
+              <label data-i18n="fieldReminders">Podsjetnici</label>
+              <div class="reminders" id="reminders">
+                <div class="reminder-row" data-reminder-row>
+                  <input class="reminder-value" type="number" min="0" step="1" value="30" />
+                  <select class="reminder-unit">
+                    <option value="minutes" data-i18n="reminderMinutes">Minute prije</option>
+                    <option value="hours" data-i18n="reminderHours">Sati prije</option>
+                    <option value="days" data-i18n="reminderDays">Dani prije</option>
+                  </select>
+                  <select class="reminder-method">
+                    <option value="popup" data-i18n="reminderNotification">Obavijest</option>
+                    <option value="email" data-i18n="reminderEmail">Email</option>
+                  </select>
+                  <button class="ghost reminder-remove" type="button" data-i18n="reminderRemove">Ukloni</button>
+                </div>
+              </div>
+              <div class="reminder-actions">
+                <button class="ghost" type="button" id="add-reminder" data-i18n="reminderAdd">+ Dodaj podsjetnik</button>
+              </div>
+              <p class="hint" data-i18n="reminderHint">Dodaj jedan ili vi&#353;e podsjetnika. 0 koristi zadane postavke kalendara.</p>
             </div>
 
             <div class="field">
-              <label for="description">Notes</label>
+              <label for="description" data-i18n="fieldNotes">Bilje&#353;ke</label>
               <textarea id="description" name="description" rows="4"></textarea>
             </div>
 
             <div class="field">
-              <label for="calendar">Calendar ID</label>
+              <label for="calendar" data-i18n="fieldCalendar">ID kalendara</label>
               <input id="calendar" name="calendar" type="text" value="primary" />
-              <p class="hint">Keep "primary" or paste another calendar ID.</p>
+              <p class="hint" data-i18n="calendarHint">Ostavi "primary" ili zalijepi drugi ID kalendara.</p>
             </div>
 
             <div class="actions">
-              <button class="primary" type="submit">Add to Google Calendar</button>
-              <button class="ghost" type="button" id="clear-form">Clear</button>
+              <button class="primary" type="submit" data-i18n="actionsSubmit">Dodaj u Google Kalendar</button>
+              <button class="ghost" type="button" id="clear-form" data-i18n="actionsClear">O&#269;isti</button>
             </div>
           </form>
         </section>
 
         <section class="panel">
           <div class="panel-head">
-            <h2>Status</h2>
-            <span class="panel-hint" id="status-title">Ready</span>
+            <h2 data-i18n="statusPanelTitle">Status</h2>
+            <span class="panel-hint" id="status-title">Spremno</span>
           </div>
           <div class="status" id="status" role="status"></div>
           <div class="source">
-            <p class="source-label">Source</p>
-            <a id="source-link" href="#" target="_blank" rel="noreferrer">No source captured yet.</a>
+            <p class="source-label" data-i18n="sourceLabel">Izvor</p>
+            <a id="source-link" href="#" target="_blank" rel="noreferrer" data-i18n="sourcePlaceholder">Nema izvora.</a>
           </div>
         </section>
       </main>

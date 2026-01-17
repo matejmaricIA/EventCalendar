@@ -80,26 +80,49 @@
     const durationMinutes = Number.isFinite(settings.durationMinutes)
       ? settings.durationMinutes
       : defaultDurationMinutes;
+    const allowMissingTime = Boolean(settings.allowMissingTime);
     const referenceDate = settings.referenceDate instanceof Date
       ? settings.referenceDate
       : new Date();
 
-    const cleaned = cleanText(text);
-    const normalized = normalizeText(text);
+    const prepared = prepareText(text);
+    const cleaned = prepared.cleaned;
+    const normalized = prepared.normalized;
     const englishHint = hasEnglishHint(normalized, cleaned);
     const dateParts = parseDateParts(cleaned, normalized, referenceDate, englishHint);
     if (!dateParts) {
       return null;
     }
 
-    const timeParts = parseTimeParts(cleaned, dateParts.range || null);
-    if (!timeParts) {
-      return null;
-    }
-
     const day = dateParts.day;
     const month = dateParts.month;
     const yearFromText = dateParts.year;
+
+    const timeParts = parseTimeParts(cleaned, dateParts.range || null);
+    if (!timeParts) {
+      if (!allowMissingTime || dateParts.isRelative) {
+        return null;
+      }
+      if (!isValidDate(day, month)) {
+        return null;
+      }
+      const year = yearFromText || referenceDate.getFullYear();
+      const dateOnly = new Date(year, month - 1, day);
+      if (!isValidDateTime(dateOnly, day, month)) {
+        return null;
+      }
+
+      return {
+        start: dateOnly,
+        end: null,
+        endOffsetDays: 0,
+        dateInput: formatDateInput(dateOnly),
+        startTimeInput: "",
+        endTimeInput: "",
+        timeMissing: true
+      };
+    }
+
     const hour = timeParts.startHour;
     const minute = timeParts.startMinute;
 
@@ -113,11 +136,6 @@
     }
 
     let start = new Date(year, month - 1, day, hour, minute);
-
-    if (!dateParts.isRelative && !yearFromText && start < referenceDate) {
-      year += 1;
-      start = new Date(year, month - 1, day, hour, minute);
-    }
 
     if (dateParts.isRelative && dateParts.relativeKind === "weekday" && start < referenceDate && dateParts.qualifier !== "next") {
       start = addDays(start, 7);
@@ -210,12 +228,57 @@
     return null;
   }
 
+  function inferDurationMinutes(text) {
+    if (!text) {
+      return null;
+    }
+
+    const prepared = prepareText(text);
+    const normalized = prepared.normalized;
+    const candidates = [];
+
+    collectDurationMatches(
+      /\b(\d{1,2})\s*(?:h|hour|hours|hrs|sat|sata|sati)\b(?:\s*(?:i|and))?\s*(\d{1,2})\s*(?:m|min|mins|minute|minutes|minuta)\b/gi,
+      normalized,
+      (match) => toInt(match[1]) * 60 + toInt(match[2]),
+      candidates,
+      3
+    );
+
+    collectDurationMatches(
+      /\b(\d{1,2})\s*h\s*(\d{1,2})\s*(?:m|min|mins|minute|minutes|minuta)\b/gi,
+      normalized,
+      (match) => toInt(match[1]) * 60 + toInt(match[2]),
+      candidates,
+      3
+    );
+
+    collectDurationMatches(
+      /\b(\d{1,3})\s*(?:min|mins|minute|minutes|minuta)\b/gi,
+      normalized,
+      (match) => toInt(match[1]),
+      candidates,
+      2
+    );
+
+    collectDurationMatches(
+      /\b(\d{1,3})\s*(?:'|\u2032|\u2019|\u00b4)(?:\b|$)/g,
+      text,
+      (match) => toInt(match[1]),
+      candidates,
+      2
+    );
+
+    const best = pickDurationCandidate(candidates);
+    return best ? best.minutes : null;
+  }
+
   function matchMonthName(normalized) {
     if (!normalized || !monthPattern) {
       return null;
     }
 
-    const forwardRegex = new RegExp(`\\b(\\d{1,2})(?:st|nd|rd|th)?\\b\\s*(${monthPattern})\\b(?:\\s*(\\d{4}))?`);
+    const forwardRegex = new RegExp(`\\b(\\d{1,2})(?:\\s*(?:st|nd|rd|th))?\\b\\s*(${monthPattern})\\b(?:\\s*(\\d{4}))?`);
     const forwardMatch = normalized.match(forwardRegex);
     if (forwardMatch) {
       return {
@@ -227,7 +290,7 @@
       };
     }
 
-    const reverseRegex = new RegExp(`\\b(${monthPattern})\\b\\s*(\\d{1,2})(?:st|nd|rd|th)?\\b(?:\\s*(\\d{4}))?`);
+    const reverseRegex = new RegExp(`\\b(${monthPattern})\\b\\s*(\\d{1,2})(?:\\s*(?:st|nd|rd|th))?\\b(?:\\s*(\\d{4}))?`);
     const reverseMatch = normalized.match(reverseRegex);
     if (reverseMatch) {
       return {
@@ -240,6 +303,39 @@
     }
 
     return null;
+  }
+
+  function collectDurationMatches(regex, text, toMinutes, candidates, weight) {
+    let match;
+    while ((match = regex.exec(text))) {
+      const minutes = toMinutes(match);
+      if (!isReasonableDuration(minutes)) {
+        continue;
+      }
+      candidates.push({
+        minutes,
+        index: match.index,
+        weight
+      });
+    }
+  }
+
+  function pickDurationCandidate(candidates) {
+    if (!candidates.length) {
+      return null;
+    }
+
+    const sorted = [...candidates].sort((a, b) => {
+      if (a.weight !== b.weight) {
+        return b.weight - a.weight;
+      }
+      if (a.index !== b.index) {
+        return a.index - b.index;
+      }
+      return b.minutes - a.minutes;
+    });
+
+    return sorted[0];
   }
 
   function parseRelativeDate(normalized, referenceDate) {
@@ -606,6 +702,20 @@
     return map;
   }
 
+  function prepareText(text) {
+    const spaced = insertLetterDigitBoundaries(text);
+    return {
+      cleaned: cleanText(spaced),
+      normalized: normalizeText(spaced)
+    };
+  }
+
+  function insertLetterDigitBoundaries(text) {
+    return text
+      .replace(/(\p{L})(\d)/gu, "$1 $2")
+      .replace(/(\d)(\p{L})/gu, "$1 $2");
+  }
+
   function normalizeText(text) {
     return text
       .normalize("NFD")
@@ -648,6 +758,10 @@
     return copy;
   }
 
+  function isReasonableDuration(minutes) {
+    return Number.isFinite(minutes) && minutes >= 1 && minutes <= 600;
+  }
+
   function isValidDate(day, month) {
     return day >= 1 && day <= 31 && month >= 1 && month <= 12;
   }
@@ -677,6 +791,7 @@
   }
 
   return {
-    parseCroatianDateTime
+    parseCroatianDateTime,
+    inferDurationMinutes
   };
 });

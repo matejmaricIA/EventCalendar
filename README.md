@@ -1,13 +1,14 @@
-# Kalendar (Chrome/Edge extension)
+# Podsjeti.Me (Chrome/Edge extension)
 
-Add a selected film date/time to Google Calendar in one right-click. Designed for quick scheduling from local cinema pages like Kino Tuskanac and Kinoteka.
+Add a selected event date/time to Google Calendar in one right-click. Designed for quick scheduling from event listings.
 
 ## What it does
 
-- Adds a right-click menu item: **Add to Google Calendar**
+- Adds a right-click menu item: **Dodaj u Google Kalendar**
 - Parses Croatian and English date/time formats like `Nedjelja, 28.12.2025 21:00`, `Dec 28, 2025 7pm`, `today 19:00`, or `19:00-21:15`
+- Infers duration from text like `Trajanje: 110 min`, `145'`, `2 sata i 15 minuta`, `140 minuta`, or `120 minutes` (falls back to 2 hours)
 - Guesses event title from the page heading/title
-- Guesses venue from known cinema names
+- Guesses venue from known venue aliases
 - Lets you adjust title, time, venue, notes, and reminder before syncing
 
 ## Setup (Google Calendar API)
@@ -37,7 +38,7 @@ Edge:
 
 ## Usage
 
-1. Select a date/time on a cinema page.
+1. Select a date/time on an event page.
 2. Right click and choose **Add to Google Calendar**.
 3. Review the event details and adjust if needed.
 4. Click **Add to Google Calendar** to sync.
@@ -48,12 +49,23 @@ Edge:
 - Default duration: `popup.js` (`defaultDurationMinutes`)
 - Default reminder: `popup.js` (`defaultReminderMinutes`)
 - Date parsing rules: `parser.js`
+- Reminder units are selected in the popup (minutes/hours/days), with multiple reminders and popup/email methods.
+- Popup language toggle between Croatian and English.
 
 ## Tests
 
 - Run `node tests/dateParser.test.js`
 
+## Chrome Web Store submission
+
+- Privacy policy: see `PRIVACY_POLICY.md` (publish it on a public URL and use that URL in the Chrome Web Store listing).
+- Store disclosures helper: see `CHROME_WEB_STORE_PRIVACY_PRACTICES.md`.
+- Keep `key.pem` private and **do not** ship it in the extension package.
+- OAuth: the `oauth2.client_id` must be configured for the final Chrome Web Store **extension ID** (you get it after creating/uploading the item in the Web Store Developer Dashboard).
+- OAuth readiness checklist: see `GOOGLE_OAUTH_PRODUCTION_CHECKLIST.md`.
+
 ## Notes
 
 - Event data is stored only in session storage between the context menu click and the popup.
 - The extension uses `chrome.identity` to request access to your Google Calendar.
+- Dates without a year default to the current year.
