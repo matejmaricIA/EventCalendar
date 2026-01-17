@@ -49,4 +49,4 @@ If this policy changes, the “Effective date” above will be updated.
 
 ### Contact
 
-For questions, contact: [ADD CONTACT EMAIL]
+For questions, contact: matej.maric99@gmail.com
