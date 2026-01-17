@@ -56,14 +56,6 @@ Edge:
 
 - Run `node tests/dateParser.test.js`
 
-## Chrome Web Store submission
-
-- Privacy policy: see `PRIVACY_POLICY.md` (publish it on a public URL and use that URL in the Chrome Web Store listing).
-- Store disclosures helper: see `CHROME_WEB_STORE_PRIVACY_PRACTICES.md`.
-- Keep `key.pem` private and **do not** ship it in the extension package.
-- OAuth: the `oauth2.client_id` must be configured for the final Chrome Web Store **extension ID** (you get it after creating/uploading the item in the Web Store Developer Dashboard).
-- OAuth readiness checklist: see `GOOGLE_OAUTH_PRODUCTION_CHECKLIST.md`.
-
 ## Notes
 
 - Event data is stored only in session storage between the context menu click and the popup.
