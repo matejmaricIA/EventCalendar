@@ -32,13 +32,25 @@ Podsjeti.Me does **not** run its own servers and does **not** send your data to 
 
 When you click “Add to Google Calendar”, the extension sends the event payload to **Google Calendar API** to create the event in your account.
 
+Podsjeti.Me does not sell your data and does not send your data to any developer-controlled servers.
+
+### Google account access
+
+Podsjeti.Me requests Google authorization via `chrome.identity` to call the Google Calendar API. The extension uses this access only to create the event you submit and does not read or modify your existing calendar events.
+
+You can revoke access at any time from your Google Account security settings (third-party access).
+
 ### Google API Services User Data Policy (Limited Use)
 
 Podsjeti.Me’s use and transfer to any other app of information received from Google APIs will adhere to the **Google API Services User Data Policy**, including the **Limited Use** requirements.
 
+### Security
+
+API requests to Google are sent over HTTPS. Podsjeti.Me does not run its own servers.
+
 ### Data retention
 
-Draft event data is intended to be temporary and is removed after an event is successfully created.
+Draft event data is intended to be temporary and is removed after an event is successfully created. Otherwise, it remains in extension storage until you clear it (for example by removing the extension).
 
 ### Your choices
 
