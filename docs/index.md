@@ -1,66 +1,29 @@
 ---
+title: Podsjeti.Me
+permalink: /
 ---
-## Podsjeti.Me Privacy Policy
 
-Effective date: 2026-01-17
+## Podsjeti.Me
 
-Podsjeti.Me is a browser extension that lets you select a date/time on a web page and add it to your Google Calendar.
+Podsjeti.Me is a browser extension that helps you quickly create Google Calendar events from date/time text you select on any webpage.
 
-### What data the extension handles
+### What it does
 
-When you use the extension, it may handle:
+- Captures selected date/time text from a page.
+- Prefills an event form so you can review and edit details.
+- Creates a Google Calendar event only after you explicitly confirm.
 
-- **Selected text** you highlight on a page (used to parse date/time and prefill event details).
-- **Page metadata** such as the page URL and title (used as the event “Source” and in the event description).
-- **Event details you enter/edit** in the extension (title, date/time, location, notes, reminders, calendar ID).
-- **Extension settings** (e.g. language preference).
+### Why Google Calendar access is requested
 
-### How the extension uses this data
+Podsjeti.Me requests Google authorization via `chrome.identity` and uses `https://www.googleapis.com/auth/calendar.events` so it can create the event you submit to your own calendar.
 
-- To display an event editor prefilled from your selection.
-- To create a Google Calendar event **only when you click** “Add to Google Calendar”.
-- To remember basic settings like language.
+Podsjeti.Me does not run developer-controlled servers and does not sell personal data.
 
-### Where the data is stored
+### Legal and privacy links
 
-- Event draft data is stored **locally in your browser** using Chrome extension storage so it can be shown in the editor window.
-- Language preference is stored locally in Chrome extension storage.
-
-Podsjeti.Me does **not** run its own servers and does **not** send your data to the developer or any third party other than Google (see below).
-
-### Sharing / transfers
-
-When you click “Add to Google Calendar”, the extension sends the event payload to **Google Calendar API** to create the event in your account.
-
-Podsjeti.Me does not sell your data and does not send your data to any developer-controlled servers.
-
-### Google account access
-
-Podsjeti.Me requests Google authorization via `chrome.identity` to call the Google Calendar API. The extension uses this access only to create the event you submit and does not read or modify your existing calendar events.
-
-You can revoke access at any time from your Google Account security settings (third-party access).
-
-### Google API Services User Data Policy (Limited Use)
-
-Podsjeti.Me’s use and transfer to any other app of information received from Google APIs will adhere to the **Google API Services User Data Policy**, including the **Limited Use** requirements.
-
-### Security
-
-API requests to Google are sent over HTTPS. Podsjeti.Me does not run its own servers.
-
-### Data retention
-
-Draft event data is intended to be temporary and is removed after an event is successfully created. Otherwise, it remains in extension storage until you clear it (for example by removing the extension).
-
-### Your choices
-
-- You can edit the event details before creating the event.
-- You can remove the extension at any time, which removes extension-stored data.
-
-### Changes to this policy
-
-If this policy changes, the “Effective date” above will be updated.
+- Privacy Policy: [https://matejmaricia.github.io/EventCalendar/privacy/](https://matejmaricia.github.io/EventCalendar/privacy/)
+- Terms of Service: [https://matejmaricia.github.io/EventCalendar/terms/](https://matejmaricia.github.io/EventCalendar/terms/)
 
 ### Contact
 
-For questions, contact: matej.maric99@gmail.com
+For support or privacy questions: matej.maric99@gmail.com
