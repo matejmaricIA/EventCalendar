@@ -2,7 +2,6 @@
   "manifest_version": 3,
   "name": "Podsjeti.Me",
   "version": "0.1.0",
-  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArLsIDuo4NF5/GyEUH1n3OYMmwrH5CCThtmaJhwhrfHKQsT06dPj+d6bs3gre6/poKgZBKWGa5XECWYq1E+yWiTCciYQsUmP8FeGXxh01aXZ9d4Vs/O/JrDshGRvL591oS8n8SBFto8D9ZZT+PqkbAxjxK/8TE8jNJ6JD13/iFox5cWU3mogVyqz1tkXOOxiTJuWetFolOMlxPXHIKozAXBtZHdLYH16YRoUcjwFGd62/31nHz+kxkEfje3V/4UNmPQo0kIq1awmNMp0xUkuA9VOLjAEGp45evOWGdvPOl/1Qc6MJYsQGIlPwHcGZ7xb7ubXeEyVkYrDtIFhJmacFVwIDAQAB",
   "description": "Dodaj odabrani termin u Google Kalendar.",
   "action": {
     "default_title": "Podsjeti.Me",
@@ -29,7 +28,7 @@
     "https://www.googleapis.com/*"
   ],
   "oauth2": {
-    "client_id": "181061661368-jesuc1ai62nuick483eqo2dg468vta23.apps.googleusercontent.com",
+    "client_id": "181061661368-u94pqi0i74lpm3nthultkgfpd3617m5t.apps.googleusercontent.com",
     "scopes": [
       "https://www.googleapis.com/auth/calendar.events"
     ]
@@ -39,5 +38,7 @@
     "32": "icons/icon32.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
-  }
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0bKK1edj7itboEOLsosETEQEDhrqHJ1qOcwZbDU+oeKvBJ2P9xDgIdYox5ioknh4mcYJ9DupurBSk6lq288bMIdXw1J/9Wj2YjnZr3Aow82IUERrtZQTKzbpy2o/hZsB8Sdtq1OjonQw+PZEOFs3NK07rprfuZJyGzRcQNmXhDEe6FWkPUPHNc7Yeg5FJ8Rn87pB2Awhv616+TW7RTe6NlkbEqD4mC4e6EDtRWHmqBUu0BufSIhtnFQ6797q9YrbkRdbHuto7GEXrSVB9MP9AnrBsZjQbteHb1fkMiS5mDFIZ6rsn6tM4JMRT2BF2cIPp2TFjkTAIslrkonWyVjWbQIDAQAB"
+
 }
